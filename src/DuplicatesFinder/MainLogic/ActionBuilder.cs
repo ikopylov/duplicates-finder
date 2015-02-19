@@ -54,7 +54,7 @@ namespace DuplicatesFinder.MainLogic
         public static void BuildDuplicatesList(string targetFile, List<EqualFileGroup> groups, bool ignoreEmpty = true)
         {
             var dir = IO.Path.GetDirectoryName(targetFile);
-            if (!IO.Directory.Exists(dir))
+            if (dir != "" && !IO.Directory.Exists(dir))
                 IO.Directory.CreateDirectory(dir);
 
             using (var wrtFile = IO.File.CreateText(targetFile))
@@ -83,7 +83,7 @@ namespace DuplicatesFinder.MainLogic
         public static void BuildDeleteList(string targetFile, List<EqualFileGroup> groups, bool ignoreEmpty = true)
         {
             var dir = IO.Path.GetDirectoryName(targetFile);
-            if (!IO.Directory.Exists(dir))
+            if (dir != "" && !IO.Directory.Exists(dir))
                 IO.Directory.CreateDirectory(dir);
 
             using (var wrtFile = IO.File.CreateText(targetFile))
@@ -112,7 +112,7 @@ namespace DuplicatesFinder.MainLogic
         public static void BuildHardLinkList(string targetFile, List<EqualFileGroup> groups, bool ignoreEmpty = true)
         {
             var dir = IO.Path.GetDirectoryName(targetFile);
-            if (!IO.Directory.Exists(dir))
+            if (dir != "" && !IO.Directory.Exists(dir))
                 IO.Directory.CreateDirectory(dir);
 
             using (var wrtFile = IO.File.CreateText(targetFile))

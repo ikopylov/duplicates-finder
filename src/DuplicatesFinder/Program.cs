@@ -26,6 +26,59 @@ namespace DuplicatesFinder
             Console.WriteLine();
         }
 
+        static void RunTest(string input, string expected)
+        {
+            var encs = Encoding.GetEncodings();
+            foreach (var src in encs)
+            {
+                foreach (var target in encs)
+                {
+                    var bt = src.GetEncoding().GetBytes(input);
+                    var str = target.GetEncoding().GetString(bt);
+
+                    if (str == expected)
+                    {
+                        Console.WriteLine("source: " + src.DisplayName + ", target = " + target.DisplayName);
+                        return;
+                    }
+                }
+            }
+        }
+
+
+        private static string DecodeString(string src)
+        {
+            if (System.Console.InputEncoding == Encoding.Default)
+                return src;
+
+            var bytes = System.Console.InputEncoding.GetBytes(src);
+            return Encoding.Default.GetString(bytes);
+        }
+
+        private static bool IsFileNameValid(string fileName)
+        {
+            try
+            {
+                var fi = new Alphaleonis.Win32.Filesystem.FileInfo(fileName);
+                return fi != null;
+            }
+            catch (Exception) { }
+
+            return false;
+        }
+
+        private static bool IsDirectoryNameValid(string dirName)
+        {
+            try
+            {
+                var di = new Alphaleonis.Win32.Filesystem.DirectoryInfo(dirName);
+                return di != null;
+            }
+            catch (Exception) { }
+
+            return false;
+        }
+
 
         static void Main(string[] args)
         {
@@ -41,6 +94,7 @@ namespace DuplicatesFinder
             int bufferSize = -1;
             string targetFile = null;
             string scanDir = null;
+            string pattern = null;
 
             for (int i = 0; i < args.Length - 2; i++)
             {
@@ -103,14 +157,39 @@ namespace DuplicatesFinder
                             return;
                         }
                         break;
+                    case "pattern":
+                        if (parts.Length != 2)
+                        {
+                            Console.WriteLine("Bad argument: " + args[i]);
+                            return;
+                        }
+                        pattern = parts[1];
+                        break;
                     default:
                         Console.WriteLine("Bad argument: " + args[i]);
                         return;
                 }
             }
 
-            targetFile = args[args.Length - 2];
-            scanDir = args[args.Length - 1];
+            targetFile = DecodeString(args[args.Length - 2]);
+            scanDir = DecodeString(args[args.Length - 1]);
+
+            bool wasDirReverted = false;
+            if (!IsDirectoryNameValid(scanDir) || !Directory.Exists(scanDir))
+            {
+                var origScanDir = args[args.Length - 1];
+                if (IsDirectoryNameValid(origScanDir) && Directory.Exists(origScanDir))
+                {
+                    wasDirReverted = true;
+                    scanDir = origScanDir;
+                }
+            }
+            if (!IsFileNameValid(targetFile) || wasDirReverted)
+            {
+                var origTargetFile = args[args.Length - 2];
+                if (IsFileNameValid(origTargetFile))
+                    targetFile = origTargetFile;
+            }
 
             if (!Directory.Exists(scanDir))
             {
@@ -139,7 +218,7 @@ namespace DuplicatesFinder
 
 
 
-                var eqFinder = new EqualFilesFinder(scanDir, comparer, !withSoftLinks);
+                var eqFinder = new EqualFilesFinder(scanDir, comparer, !withSoftLinks, pattern);
                 var resList = eqFinder.Find();
                 resList.Sort((a, b) => a.Initial.FullName.CompareTo(b.Initial.FullName));
 

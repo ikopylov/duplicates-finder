@@ -16,12 +16,14 @@ namespace DuplicatesFinder.MainLogic
         private FileComparer _comparer;
         private bool _ignoreSoftLinks;
         private string _initialDir;
+        private string _searchPattern;
 
-        public EqualFilesFinder(string dir, FileComparer comp, bool ignoreSoftLinks)
+        public EqualFilesFinder(string dir, FileComparer comp, bool ignoreSoftLinks, string searchPattern)
         {
             _initialDir = System.IO.Path.GetFullPath(dir);
             _comparer = comp;
             _ignoreSoftLinks = ignoreSoftLinks;
+            _searchPattern = searchPattern;
         }
 
 
@@ -50,7 +52,7 @@ namespace DuplicatesFinder.MainLogic
 
             Dictionary<FastFileKey, List<EqualFileGroup>> fastDict = new Dictionary<FastFileKey, List<EqualFileGroup>>();
 
-            foreach (var fileName in DuplicatesFinder.Helpers.FileIterator.GetFiles(_initialDir))
+            foreach (var fileName in DuplicatesFinder.Helpers.FileIterator.GetFiles(_initialDir, _searchPattern))
             {
                 try
                 {

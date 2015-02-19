@@ -9,7 +9,7 @@ namespace DuplicatesFinder.Helpers
 {
     public static class FileIterator
     {
-        public static IEnumerable<string> GetFiles(string path)
+        public static IEnumerable<string> GetFiles(string path, string pattern = null)
         {
             Stack<string> queue = new Stack<string>();
             queue.Push(path);
@@ -31,7 +31,10 @@ namespace DuplicatesFinder.Helpers
                 string[] files = null;
                 try
                 {
-                    files = IO.Directory.GetFiles(path);
+                    if (pattern == null)
+                        files = IO.Directory.GetFiles(path);
+                    else
+                        files = IO.Directory.GetFiles(path, pattern);
                 }
                 catch (UnauthorizedAccessException ex)
                 {
