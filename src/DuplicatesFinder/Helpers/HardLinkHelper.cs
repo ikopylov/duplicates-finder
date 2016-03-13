@@ -106,13 +106,15 @@ namespace DuplicatesFinder.Helpers
             stringLength = MaxFilePath;
             IntPtr findHandle = FindFirstFileNameW(filepath, 0, ref stringLength, sb);
 
-            if (findHandle.ToInt32() == -1)
+            if (findHandle.ToInt64() == -1)
                 return null;
 
             try
             {
                 do
                 {
+                    if (sb.Length > 0 && sb[0] == '\\')
+                        sb.Remove(0, 1);
                     result.Add(IO.Path.Combine(volume, sb.ToString()));
                 }
                 while (FindNextFileNameW(findHandle, ref stringLength, sb));

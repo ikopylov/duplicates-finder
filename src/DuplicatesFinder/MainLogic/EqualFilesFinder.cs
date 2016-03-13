@@ -63,7 +63,7 @@ namespace DuplicatesFinder.MainLogic
 
                     if (DateTime.Now - lastTime > LogPeriod)
                     {
-                        Console.WriteLine(string.Format("Scanned {0} files. Current file: '{1}'", scannedFiles, fData.FullName));
+                        Console.WriteLine(string.Format("Scanned {0} files. Finded duplicates: {1}. Current file: '{2}'", scannedFiles, duplicates, fData.FullName));
                         Console.WriteLine();
                         lastTime = DateTime.Now;
                     }
